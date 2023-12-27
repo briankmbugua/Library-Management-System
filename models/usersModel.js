@@ -2,50 +2,70 @@ const bcrypt = require('bcrypt');
 const db = require('../services/db.js');
 
 class UsersModel {
-    static async registerLibrarianAndLibrary(username, password, name, email, libraryName, libraryAddress, libraryPhoneNumber, libraryEmail) {
-        const hashedPassword = hashPassword(password);
+    static async registerUser(username, password, name, email, usertype, library_id = 4) {
         try {
-            // Register librarian
-            const librarianQuery = 'INSERT INTO users (username, password, name, email, role) VALUES (?, ?, ?, ?, ?)';
-            const librarianParams = [username, hashedPassword, name, email, 'librarian'];
-            const librarianResult = await db.query(librarianQuery, librarianParams);
-
-            if (librarianResult && librarianResult.insertId) {
-                //Register library and associate it with the librariab
-                const libraryQuery = 'INSERT INTO libraries (name, address, phone_number, email, librarian_id) VALUES(?, ?, ?, ?, ?)';
-                libraryParams = [libraryName, libraryAddress, libraryPhoneNumber, libraryEmail, librarianResult.insertId];
-                const libraryResult = await db.query(libraryQuery, libraryParams);
-
-                if (libraryResult) {
-                    return { librarianId: librarianResult.insertId, libraryId: libraryResult.insertId };
-                }
-
+            const hashedPassword = hashPassword(password);
+            const query = 'INSERT INTO users (username, password, name, email, role, library_id) VALUES (?, ?, ?, ?, ?)';
+            const params = [username || null, hashedPassword || null, name || null, email || null, usertype || null, library_id] || null;
+            console.log(params.username)
+            const result = await db.query(query, params);
+            if (result && result.insertId) {
+                return { userId: result.insertId, username, name, email, role: usertype };
+            } else {
+                return null;
             }
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
-            return null;
+
+    static async getUserById(userId) {
+        try {
+            const query = 'SELECT * FROM users WHERE id = ?';
+            const params = [userId];
+            const results = await db.query(query, params);
+            return results.length > 0 ? results[0] : null;
         } catch (error) {
             throw error;
         }
     }
 
-    static async getUserById(userId) {
-
-    }
-
-    static async getUserByName(username) {
-
-    }
 
     static async updateUserDetails(userId, updateDetails) {
+        try {
+            const { username, password, name, email } = updateDetails;
 
+            const query = 'UPDATE users SET username = ?, password = ?, name = ?, email = ? WHERE id = ?';
+            const params = [username, password, name, email, userId];
+
+            const result = await db.query(query, params);
+
+            // Check if the update was successful
+            if (result.affectedRows > 0) {
+                return { success: true, message: 'User details updated successfully' };
+            } else {
+                return { success: false, message: 'User not found or no changes applied' };
+            }
+        } catch (error) {
+            throw error;
+        }
     }
 
-    static async deletUser(userId) {
+    static async deleteUser(userId) {
+        try {
+            const query = 'DELETE FROM users WHERE id = ?';
+            const params = [userId];
 
-    }
-
-    static async addStaff(username, password, name, email) {
-
+            const result = await db.query(query, params);
+            if (result.affectedRows > 0) {
+                return { success: true, message: 'User deleted successfully' };
+            } else {
+                return { success: false, message: 'User not found or deletion unsuccessful' };
+            }
+        } catch (error) {
+            throw error;
+        }
     }
 }
 
