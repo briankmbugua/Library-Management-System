@@ -6,27 +6,14 @@ router.post('/', async (req, res) => {
     const {
         username,
         password,
-        name,
-        email
+        email,
+        role,
+        library_name,
+        library_address,
+        phone_number,
+        library_email
     } = req.body;
-
-    try {
-        const result = await UsersModel.registerUser(
-            username,
-            password,
-            name,
-            email
-        );
-
-        if (result) {
-            res.status(201).json({ message: "Librarian registered successfully", data: result });
-        } else {
-            res.status(500).json({ error: "Librarian registration failed" });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
+    console.log(req.body);
 });
 
 module.exports = router;

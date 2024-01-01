@@ -1,16 +1,19 @@
 const bcrypt = require('bcrypt');
 const db = require('../services/db.js');
+const libraries = require('./librariesModel.js')
 
 class UsersModel {
-    static async registerUser(username, password, name, email, usertype, library_id = 4) {
+    static async registerUser(username, password,  user_email, usertype, library_name, address, phone_number) {
         try {
+            //first register the library to use the library_id below with user
+            const addlibraryResult = libraries.addLibrary(library_name,address, phone_number, email);
             const hashedPassword = hashPassword(password);
             const query = 'INSERT INTO users (username, password, name, email, role, library_id) VALUES (?, ?, ?, ?, ?)';
-            const params = [username || null, hashedPassword || null, name || null, email || null, usertype || null, library_id] || null;
-            console.log(params.username)
+            const params = [username || null, hashedPassword || null, email || null, usertype || null, addlibraryResult.insertId || null];
+            console.log(params)
             const result = await db.query(query, params);
             if (result && result.insertId) {
-                return { userId: result.insertId, username, name, email, role: usertype };
+                return { userId: result.insertId, username, email, role: usertype };
             } else {
                 return null;
             }
@@ -18,6 +21,38 @@ class UsersModel {
             console.log(error);
         }
     }
+    /*
+    const bcrypt = require('bcryptjs');
+
+// Registration middleware (modified)
+async function registrationMiddleware(req, res, next) {
+    const { username, password, name, email, role, library_name, library_address } = req.body;
+
+    try {
+        // Validate user input and library information
+
+        // Create library if necessary
+        const libraryInsertResult = await db.query('INSERT INTO libraries (name, address) VALUES (?, ?)', [library_name, library_address]);
+
+        const library_id = libraryInsertResult.insertId;
+
+        // Hash password and insert user
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const userInsertResult = await db.query('INSERT INTO users (username, password, name, email, role, library_id) VALUES (?, ?, ?, ?, ?, ?)', [username, hashedPassword, name, email, role, library_id]);
+
+        // Handle success
+        res.status(200).json({ message: 'Registration successful' });
+    } catch (error) {
+        // Handle errors
+        console.error(error);
+        res.status(500).json({ message: 'Registration failed' });
+    }
+}
+
+module.exports = registrationMiddleware;
+
+     */
 
 
     static async getUserById(userId) {

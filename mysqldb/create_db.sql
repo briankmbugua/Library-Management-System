@@ -4,11 +4,11 @@ USE library_db;
 
 -- Table library
 CREATE TABLE IF NOT EXISTS `libraries` (
-    `id` INT NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255),
-    `address` VARCHAR(255),
-    `phone_number` VARCHAR(15) NULL,
-    `email` VARCHAR(255) NULL,
+    `library_id` INT NOT NULL AUTO_INCREMENT,
+    `library_name` VARCHAR(255),
+    `library_address` VARCHAR(255),
+    `library_phone_number` VARCHAR(15) NULL,
+    `library_email` VARCHAR(255) NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB COMMENT = 'Information about the library';
 
@@ -24,17 +24,16 @@ CREATE TABLE IF NOT EXISTS `books` (
     -- Added the missing library_id field
     `library_id` INT,
     PRIMARY KEY (`id`),
-    CONSTRAINT `fk_library` FOREIGN KEY (`library_id`) REFERENCES `libraries` (`id`),
+    CONSTRAINT `fk_library` FOREIGN KEY (`library_id`) REFERENCES `libraries` (`library_id`),
     UNIQUE INDEX `isbn_UNIQUE` (`isbn` ASC) VISIBLE,
     UNIQUE INDEX `title_UNIQUE` (`title` ASC) VISIBLE
 ) ENGINE = InnoDB COMMENT = 'A single book details';
 
 -- Table users
 CREATE TABLE IF NOT EXISTS `users` (
-    `id` INT NOT NULL AUTO_INCREMENT,
+    `user_id` INT NOT NULL AUTO_INCREMENT,
     `username` VARCHAR(255),
     `password` VARCHAR(255),
-    `name` VARCHAR(255),
     `email` VARCHAR(255),
     `role` ENUM('librarian', 'staff', 'member'),
     `library_id` INT,

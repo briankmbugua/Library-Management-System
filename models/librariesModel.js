@@ -30,7 +30,7 @@ class Libraries {
             const result = await db.query(query, params);
 
             if (result && result.insertId) {
-                return { libraryId: result.insertId, name, address, phone_number, email };
+                return { result };
             }
             else {
                 return null;
