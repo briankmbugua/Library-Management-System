@@ -13,24 +13,28 @@ class Libraries {
             throw error;
         }
     }
-    static async getLibraryById(id) {
-        const query = 'SELECT * FROM libraries WHERE id = ?';
+    static async getLibraryById(library_id) {
+        const query = 'SELECT * FROM libraries WHERE library_id = ?';
 
         try {
-            const results = await db.query(query, [id]);
+            const results = await db.query(query, [library_id]);
             return results[0];
         } catch (error) {
             throw error;
         }
     }
-    static async addLibrary(name, address, phone_number, email) {
+    static async addLibrary(library_name,library_address,library_phone_number, library_email) {
         try {
-            const query = 'INSERT INTO libraries(name, address, phone_number, email) VALUES(?, ?, ?,?)';
-            const params = [name, address, phone_number, email];
+            console.log("registering library")
+            const query = 'INSERT INTO libraries(library_name,library_address,library_phone_number, library_email) VALUES(?, ?, ?, ?)';
+            const params = [library_name,library_address,library_phone_number, library_email];
+            console.log(params);
             const result = await db.query(query, params);
-
+            console.log(result);
             if (result && result.insertId) {
-                return { result };
+                const library_id = result.insertId;
+                console.log(library_id);
+                return { library_id};
             }
             else {
                 return null;
@@ -39,11 +43,11 @@ class Libraries {
             throw error;
         }
     }
-    static async updateLibraryDetails(libraryId, updatedDetails) {
+    static async updateLibraryDetails(library_id, updatedDetails) {
         try {
-            const query = 'UPDATE libraries SET name = ?, address = ?, phone_number = ? email = ? WHERE id = ?';
-            const { name, address, phone_number, email } = updatedDetails;
-            const params = [name, address, phone_number, email, libraryId];
+            const query = 'UPDATE libraries SET library_name = ?, library_address = ?, library_phone_number = ? library_email = ? WHERE library_id = ?';
+            const { library_name, library_address, library_phone_number, library_email } = updatedDetails;
+            const params = [library_name, library_address, library_phone_number, library_email, library_id];
             const result = await db.query(query, params);
 
             if (result.affectedRows > 0) {
