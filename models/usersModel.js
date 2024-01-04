@@ -3,58 +3,34 @@ const db = require('../services/db.js');
 const libraries = require('./librariesModel.js')
 
 class UsersModel {
-    static async registerUser(username, password,  user_email, usertype, library_name, address, phone_number) {
+    static async registerUser(username, password,  email, role ,  library_name, library_address, library_phone_number, library_email) {
         try {
             //first register the library to use the library_id below with user
-            const addlibraryResult = libraries.addLibrary(library_name,address, phone_number, email);
-            const hashedPassword = hashPassword(password);
-            const query = 'INSERT INTO users (username, password, name, email, role, library_id) VALUES (?, ?, ?, ?, ?)';
-            const params = [username || null, hashedPassword || null, email || null, usertype || null, addlibraryResult.insertId || null];
-            console.log(params)
-            const result = await db.query(query, params);
-            if (result && result.insertId) {
-                return { userId: result.insertId, username, email, role: usertype };
-            } else {
-                return null;
+            const addlibraryResult = await libraries.addLibrary(library_name,library_address,library_phone_number, library_email);
+            console.log(`addLibrartResult ${addlibraryResult.library_id}`)
+            console.log(JSON.stringify(addlibraryResult, null, 2));
+            let library_id;
+            console.log(`the library_id from registerUser ${addlibraryResult.library_id}`);
+            if(addlibraryResult && addlibraryResult.library_id) {
+                library_id = addlibraryResult.library_id;
+                const hashedPassword = await hashPassword(password);
+                console.log(`the params:${hashedPassword}`)
+                role = "librarian"
+                const query = 'INSERT INTO users (username, password, email, role, library_id) VALUES (?, ?, ?, ?, ?)';
+                const params = [username, hashedPassword, email, role, library_id];
+                console.log(`the params:${params}`)
+                const result = await db.query(query, params);
+                if (result) {
+                    return { userId: result.insertId, username, email, role};
+                } else {
+                    return null;
+                }
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
+            throw error;
         }
     }
-    /*
-    const bcrypt = require('bcryptjs');
-
-// Registration middleware (modified)
-async function registrationMiddleware(req, res, next) {
-    const { username, password, name, email, role, library_name, library_address } = req.body;
-
-    try {
-        // Validate user input and library information
-
-        // Create library if necessary
-        const libraryInsertResult = await db.query('INSERT INTO libraries (name, address) VALUES (?, ?)', [library_name, library_address]);
-
-        const library_id = libraryInsertResult.insertId;
-
-        // Hash password and insert user
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const userInsertResult = await db.query('INSERT INTO users (username, password, name, email, role, library_id) VALUES (?, ?, ?, ?, ?, ?)', [username, hashedPassword, name, email, role, library_id]);
-
-        // Handle success
-        res.status(200).json({ message: 'Registration successful' });
-    } catch (error) {
-        // Handle errors
-        console.error(error);
-        res.status(500).json({ message: 'Registration failed' });
-    }
-}
-
-module.exports = registrationMiddleware;
-
-     */
-
-
     static async getUserById(userId) {
         try {
             const query = 'SELECT * FROM users WHERE id = ?';
@@ -104,10 +80,17 @@ module.exports = registrationMiddleware;
     }
 }
 
+// async function hashPassword(password) {
+//     const saltRounds = 10;
+//     return bcrypt.hash(password, saltRounds);
+// }
+
 async function hashPassword(password) {
     const saltRounds = 10;
-    return bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    return hashedPassword;
 }
+
 
 
 module.exports = UsersModel;
