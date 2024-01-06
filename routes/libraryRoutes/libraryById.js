@@ -1,5 +1,5 @@
 let express = require('express');
-const { libraryParamMiddleware } = require('../middlewares/libraryMiddleware')
+const { libraryParamMiddleware } = require('../../middlewares/libraryMiddleware');
 let router = express.Router();
 
 
