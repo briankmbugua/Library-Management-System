@@ -14,6 +14,7 @@ class Libraries {
         }
     }
     static async getLibraryById(library_id) {
+        console.log('in getLibraryById')
         const query = 'SELECT * FROM libraries WHERE library_id = ?';
 
         try {
@@ -45,7 +46,7 @@ class Libraries {
     }
     static async updateLibraryDetails(library_id, updatedDetails) {
         try {
-            const query = 'UPDATE libraries SET library_name = ?, library_address = ?, library_phone_number = ? library_email = ? WHERE library_id = ?';
+            const query = 'UPDATE libraries SET library_name = ?, library_address = ?, library_phone_number = ? ,library_email = ? WHERE library_id = ?';
             const { library_name, library_address, library_phone_number, library_email } = updatedDetails;
             const params = [library_name, library_address, library_phone_number, library_email, library_id];
             const result = await db.query(query, params);
@@ -63,16 +64,25 @@ class Libraries {
 
     static async deleteLibrary(libraryId) {
         try {
-            const query = ' DELETE FROM libraries WHERE id = ?';
-            const params = [libraryId];
-            const result = await db.query(query, params);
+        // Delete books associated with the library
+      await db.query('DELETE FROM books WHERE library_id = ?', [libraryId]);
 
-            if (result.affectedRows > 0) {
-                return { succes: true, message: 'Library deleted successfully' };
-            }
-            else {
-                return { succes: false, message: 'Library not found' };
-            }
+      // Delete users associated with the library
+      await db.query('DELETE FROM users WHERE library_id = ?', [libraryId]);
+
+      // Delete borrowing history associated with the library
+      await db.query('DELETE FROM borrowing_history WHERE library_id = ?', [libraryId]);
+
+      // Delete fines associated with the library
+      await db.query('DELETE FROM fines WHERE library_id = ?', [libraryId]);
+
+      // Finally, delete the library itself
+      const deleteLibraryResult = await db.query('DELETE FROM libraries WHERE library_id = ?', [libraryId]);
+      if (deleteLibraryResult.affectedRows > 0) {
+        return { success: true, message: 'Library deleted successfully' };
+      } else {
+        return { success: false, message: 'Library not found or deletion unsuccessful' };
+      }
         } catch (error) {
             throw error;
         }
