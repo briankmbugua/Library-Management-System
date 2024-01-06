@@ -5,9 +5,11 @@ let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 
 let indexRouter = require('./routes/index');
-let usersRouter = require('./routes/users');
-let testRouter = require('./routes/test');
-let librarianRegister = require('./routes/librariansRegister');
+let registerlibrarianAndLibrary = require('./routes/usersRoutes/registerLibrarianAndLibrary');
+let librarianLogin = require('./routes/usersRoutes/librariansLogin');
+let librariesById = require('./routes/libraryRoutes/libraryById');
+let updateLibrary = require('./routes/libraryRoutes/updateLibrary');
+let deleteLibrary = require('./routes/libraryRoutes/deleteLibrary');
 
 let app = express();
 
@@ -22,9 +24,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/test', testRouter);
-app.use('/librarianRegister', librarianRegister);
+app.use('/registerlibrarianAndLibrary', registerlibrarianAndLibrary);
+app.use('/librarianLogin', librarianLogin);
+app.use('/librariesById', librariesById);
+app.use('/updateLibrary', updateLibrary);
+app.use('/deleteLibrary', deleteLibrary);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
