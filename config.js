@@ -7,6 +7,8 @@ const config = {
         connectTimeout: 6000
     },
     listPerPage: 10,
+    secretKey: 'brian'
+
 };
 
 module.exports = config;
