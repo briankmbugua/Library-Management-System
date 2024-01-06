@@ -1,32 +1,29 @@
 const jwt = require('jsonwebtoken');
+const { secretKey }= require('../config'); // Replace with your actual secret key
 
-async function authMiddleware(req, res, next) {
+function authenticateMiddleware(req, res, next) {
     const authHeader = req.headers['authorization'];
-    console.log(`from authmiddleware${authHeader}`);
-    const token = authHeader && authHeader.split(' ')[1];
-    console.log(`from authmiddleware${token}`);
     
-    try {
-        if (!token) {
-            return res.status(401).json({ message: 'Unauthorized' });
+    if (!authHeader) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    jwt.verify(token, secretKey, (err, user) => {
+        if (err) {
+            return res.status(403).json({ message: 'Forbidden' });
         }
 
-        const user = jwt.verify(token, secretKey);
-
-        // Query database to validate user's existence and role
-        const queryResults = await db.query('SELECT * FROM users WHERE id = ? AND role = ?', [user.id, user.role]);
-
-        if (queryResults.length === 0) {
-            return res.status(403).json({ message: 'Invalid credentials' });
-        }
-
+        // Set the authenticated user information to req.user
         req.user = user;
         next();
-    } catch (error) {
-        // Handle errors
-        console.error(error);
-        return res.status(403).json({ message: 'Forbidden' });
-    }
+    });
 }
 
-module.exports = authMiddleware;
+module.exports = authenticateMiddleware;
+
