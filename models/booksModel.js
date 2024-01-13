@@ -1,11 +1,34 @@
 const db = require('../services/db');
 
 class BooksModel {
-    static async addBook(libraryId, title, author, isbn, publicationDate, genre) {
+    static async addBook(title, author, isbn, publication_date, genre, available, library_id) {
         try {
-            // Implement method to add a book to a library
-            // Example query: 'INSERT INTO books (title, author, isbn, publication_date, genre, available, library_id) VALUES (?, ?, ?, ?, ?, true, ?)'
-            // Return the book details or null if not successful
+            console.log('Received parameters in addBook model:');
+            console.log('title:', title);
+            console.log('author:', author);
+            console.log('isbn:', isbn);
+            console.log('publication_date:', publication_date);
+            console.log('genre:', genre);
+            console.log('available:', available);
+            console.log('library_id:', library_id);
+            const query = 'INSERT INTO books (title, author, isbn, publication_date, genre, available, library_id) VALUES (?, ?, ?, ?, ?, ?, ?)';
+            const params = [
+                title || null,
+                author || null,
+                isbn || null,
+                new Date(publication_date) || null,
+                genre || null,
+                available,
+                library_id || null
+            ];
+            const result = await db.query(query, params);
+
+            if (result && result.insertId) {
+                const bookId = result.insertId;
+                return { bookId, title, author, isbn, publication_date, genre, available: true, library_id };
+            } else {
+                return null;
+            }
         } catch (error) {
             throw error;
         }
@@ -13,9 +36,10 @@ class BooksModel {
 
     static async getBookById(bookId) {
         try {
-            // Implement method to retrieve book details by ID from the database
-            // Example query: 'SELECT * FROM books WHERE id = ?'
-            // Return book details or null if not found
+            const query = 'SELECT * FROM books WHERE id = ?';
+            const results = await db.query(query, [bookId]);
+
+            return results[0] || null;
         } catch (error) {
             throw error;
         }
@@ -23,9 +47,12 @@ class BooksModel {
 
     static async updateBookDetails(bookId, updatedDetails) {
         try {
-            // Implement method to update book details in the database
-            // Example query: 'UPDATE books SET title = ?, author = ?, isbn = ?, publication_date = ?, genre = ? WHERE id = ?'
-            // Return true if successful, false otherwise
+            const { title, author, isbn, publicationDate, genre } = updatedDetails;
+            const query = 'UPDATE books SET title = ?, author = ?, isbn = ?, publication_date = ?, genre = ? WHERE id = ?';
+            const params = [title, author, isbn, publicationDate, genre, bookId];
+            const result = await db.query(query, params);
+
+            return result.affectedRows > 0;
         } catch (error) {
             throw error;
         }
@@ -33,21 +60,21 @@ class BooksModel {
 
     static async deleteBook(bookId) {
         try {
-            // Implement method to delete a book from the database
-            // Example query: 'DELETE FROM books WHERE id = ?'
-            // Return true if successful, false otherwise
+            const query = 'DELETE FROM books WHERE id = ?';
+            const result = await db.query(query, [bookId]);
+
+            return result.affectedRows > 0;
         } catch (error) {
             throw error;
         }
     }
 
-    // Add more CRUD methods as needed
-
     static async getAllBooks(libraryId) {
         try {
-            // Implement method to retrieve details of all books in a library
-            // Example query: 'SELECT * FROM books WHERE library_id = ?'
-            // Return an array of book details or an empty array if no books found
+            const query = 'SELECT * FROM books WHERE library_id = ?';
+            const results = await db.query(query, [libraryId]);
+
+            return results || [];
         } catch (error) {
             throw error;
         }
@@ -55,3 +82,4 @@ class BooksModel {
 }
 
 module.exports = BooksModel;
+
