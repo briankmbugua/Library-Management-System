@@ -5,10 +5,14 @@ USE library_db;
 -- Table library
 CREATE TABLE IF NOT EXISTS `libraries` (
     `library_id` INT NOT NULL AUTO_INCREMENT,
-    `library_name` VARCHAR(255),
-    `library_address` VARCHAR(255),
-    `library_phone_number` VARCHAR(15) NULL,
-    `library_email` VARCHAR(255) NULL,
+    `library_name` VARCHAR(255) NOT NULL,
+    `library_address` VARCHAR(255) NOT NULL,
+    `library_phone_number` VARCHAR(15) NOT NULL,
+    `library_email` VARCHAR(255) NOT NULL,
+    UNIQUE INDEX `library_name_UNIQUE` (`library_name` ASC) VISIBLE,
+    UNIQUE INDEX `library_address_UNIQUE` (`library_address` ASC) VISIBLE,
+    UNIQUE INDEX `library_phone_number_UNIQUE` (`library_phone_number` ASC) VISIBLE,
+    UNIQUE INDEX `library_email_UNIQUE` (`library_email` ASC) VISIBLE,
     PRIMARY KEY (`library_id`)
 ) ENGINE = InnoDB COMMENT = 'Information about the library';
 
@@ -26,15 +30,14 @@ CREATE TABLE IF NOT EXISTS `books` (
     PRIMARY KEY (`id`),
     CONSTRAINT `book_library` FOREIGN KEY (`library_id`) REFERENCES `libraries` (`library_id`),
     UNIQUE INDEX `isbn_UNIQUE` (`isbn` ASC) VISIBLE,
-    UNIQUE INDEX `title_UNIQUE` (`title` ASC) VISIBLE
 ) ENGINE = InnoDB COMMENT = 'A single book details';
 
 -- Table users
 CREATE TABLE IF NOT EXISTS `users` (
     `user_id` INT NOT NULL AUTO_INCREMENT,
-    `username` VARCHAR(255),
-    `password` VARCHAR(255),
-    `email` VARCHAR(255),
+    `username` VARCHAR(255) NOT NULL,
+    `password` VARCHAR(255) NOT NULL,
+    `email` VARCHAR(255) NOT NULL,
     `role` ENUM('librarian', 'staff', 'member'),
     `library_id` INT,
     -- Added the missing library_id field
