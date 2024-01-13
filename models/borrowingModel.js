@@ -3,9 +3,11 @@ const db = require('../services/db');
 class BorrowingModel {
     static async issueBook(userId, bookId, libraryId) {
         try {
-            // Implement method to record when a librarian issues a book to a user
-            // Example query: 'INSERT INTO borrowing_history (user_id, book_id, library_id, borrowed_date) VALUES (?, ?, ?, CURRENT_TIMESTAMP)'
-            // Return true if successful, false otherwise
+            const query = 'INSERT INTO borrowing_history (user_id, book_id, library_id, borrowed_date) VALUES (?, ?, ?, CURRENT_TIMESTAMP)';
+            const params = [userId, bookId, libraryId];
+            const result = await db.query(query, params);
+
+            return result.affectedRows > 0;
         } catch (error) {
             throw error;
         }
@@ -13,9 +15,10 @@ class BorrowingModel {
 
     static async returnBook(borrowingId) {
         try {
-            // Implement method to record when a user returns a book
-            // Example query: 'UPDATE borrowing_history SET returned_date = CURRENT_TIMESTAMP WHERE id = ?'
-            // Return true if successful, false otherwise
+            const query = 'UPDATE borrowing_history SET returned_date = CURRENT_TIMESTAMP WHERE id = ?';
+            const result = await db.query(query, [borrowingId]);
+
+            return result.affectedRows > 0;
         } catch (error) {
             throw error;
         }
@@ -23,10 +26,19 @@ class BorrowingModel {
 
     static async calculateFine(borrowingId) {
         try {
-            // Implement method to calculate fines for overdue books
-            // You may need to fetch due_date and returned_date from the borrowing_history table
-            // Calculate the difference and apply your fine calculation logic
-            // Return the fine amount or 0 if not applicable
+            const historyQuery = 'SELECT borrowed_date, due_date, returned_date FROM borrowing_history WHERE id = ?';
+            const historyResult = await db.query(historyQuery, [borrowingId]);
+
+            if (historyResult.length > 0) {
+                const { borrowed_date, due_date, returned_date } = historyResult[0];
+                const overdueDays = Math.max(0, new Date(returned_date || new Date()) - new Date(due_date));
+                const fineAmountPerDay = 1; // Adjust this value based on your fine calculation logic
+                const fine = overdueDays * fineAmountPerDay;
+
+                return fine;
+            } else {
+                return 0;
+            }
         } catch (error) {
             throw error;
         }
@@ -34,13 +46,14 @@ class BorrowingModel {
 
     static async getBorrowingHistory(userId, libraryId) {
         try {
-            // Implement method to retrieve borrowing history details for a user in a specific library
-            // Example query: 'SELECT * FROM borrowing_history WHERE user_id = ? AND library_id = ?'
-            // Return an array of borrowing history details or an empty array if no history found
+            const query = 'SELECT * FROM borrowing_history WHERE user_id = ? AND library_id = ?';
+            const results = await db.query(query, [userId, libraryId]);
+
+            return results || [];
         } catch (error) {
             throw error;
         }
     }
 }
 
-module.expprts = BorrowingModel;
+module.exports = BorrowingModel;

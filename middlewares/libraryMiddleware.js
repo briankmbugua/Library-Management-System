@@ -5,7 +5,7 @@ const LibrariesModel = require('../models/librariesModel');
 async function libraryParamMiddleware(req, res, next, id) {
     try {
         const library = await LibrariesModel.getLibraryById(id);
-
+        console.log(library);
         if (library) {
             req.library = library;
             next();
