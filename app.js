@@ -10,6 +10,8 @@ let librarianLogin = require('./routes/usersRoutes/librariansLogin');
 let librariesById = require('./routes/libraryRoutes/libraryById');
 let updateLibrary = require('./routes/libraryRoutes/updateLibrary');
 let deleteLibrary = require('./routes/libraryRoutes/deleteLibrary');
+//books
+let addBook = require('./routes/booksRoutes/addBook');
 
 let app = express();
 
@@ -29,6 +31,8 @@ app.use('/librarianLogin', librarianLogin);
 app.use('/librariesById', librariesById);
 app.use('/updateLibrary', updateLibrary);
 app.use('/deleteLibrary', deleteLibrary);
+// books
+app.use('/addBook', addBook);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
