@@ -12,7 +12,8 @@ let updateLibrary = require('./routes/libraryRoutes/updateLibrary');
 let deleteLibrary = require('./routes/libraryRoutes/deleteLibrary');
 //books
 let addBook = require('./routes/booksRoutes/addBook');
-
+let loggedInLibrarianBooks = require('./routes/booksRoutes/loggedInLibrarianBooks');
+let updateBook = require('./routes/booksRoutes/updateBook');
 let app = express();
 
 // view engine setup
@@ -33,6 +34,8 @@ app.use('/updateLibrary', updateLibrary);
 app.use('/deleteLibrary', deleteLibrary);
 // books
 app.use('/addBook', addBook);
+app.use('/loggedInLibrarianBooks', loggedInLibrarianBooks);
+app.use('/updateBook', updateBook);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
