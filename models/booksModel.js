@@ -109,10 +109,10 @@ class BooksModel {
     }
     
 
-    static async deleteBook(bookId) {
+    static async deleteBook(bookId, library_id) {
         try {
-            const query = 'DELETE FROM books WHERE id = ?';
-            const result = await db.query(query, [bookId]);
+            const query = 'DELETE FROM books WHERE id = ? AND library_id = ?;';
+            const result = await db.query(query, [bookId, library_id]);
 
             return result.affectedRows > 0;
         } catch (error) {
