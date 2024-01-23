@@ -25,7 +25,6 @@ CREATE TABLE IF NOT EXISTS `books` (
     `publication_date` DATE NULL,
     `genre` VARCHAR(255) NULL,
     `available` BOOLEAN,
-    -- Added the missing library_id field
     `library_id` INT,
     PRIMARY KEY (`id`),
     CONSTRAINT `book_library` FOREIGN KEY (`library_id`) REFERENCES `libraries` (`library_id`),
@@ -33,46 +32,49 @@ CREATE TABLE IF NOT EXISTS `books` (
 ) ENGINE = InnoDB COMMENT = 'A single book details';
 
 -- Table users
-CREATE TABLE IF NOT EXISTS `users` (
+CREATE TABLE IF NOT EXISTS `librarians` (
     `user_id` INT NOT NULL AUTO_INCREMENT,
     `username` VARCHAR(255) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
     `email` VARCHAR(255) NOT NULL,
-    `role` ENUM('librarian', 'staff', 'member'),
+    `role` ENUM('librarian'),
     `library_id` INT,
-    -- Added the missing library_id field
     PRIMARY KEY (`user_id`),
     CONSTRAINT `users_library` FOREIGN KEY (`library_id`) REFERENCES `libraries` (`library_id`),
     UNIQUE INDEX `username_UNIQUE` (`username` ASC) VISIBLE,
     UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE
-) ENGINE = InnoDB COMMENT = 'A table for user details';
+) ENGINE = InnoDB COMMENT = 'A table for librarian details';
 
--- Borrowing history
+CREATE TABLE IF NOT EXISTS `members` (
+    `member_id` INT NOT NULL AUTO_INCREMENT,
+    `username` VARCHAR(255) NOT NULL,
+    `email` VARCHAR(255) NOT NULL,
+    `library_id` INT,
+    PRIMARY KEY (`member_id`),
+    CONSTRAINT `member_library` FOREIGN KEY (`library_id`) REFERENCES `libraries` (`library_id`),
+    UNIQUE INDEX `username_UNIQUE` (`username` ASC) VISIBLE,
+    UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE
+) ENGINE = InnoDB COMMENT = 'A table for library member details';
+
 CREATE TABLE IF NOT EXISTS `borrowing_history` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `borrowed_date` DATETIME,
     `due_date` DATETIME,
     `returned_date` DATETIME,
-    -- missing library_id field
     `library_id` INT,
-    -- added missing user_id field
-    `user_id` INT,
-    -- added the missing book_id field
+    `member_id` INT,
     `book_id` INT,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_library_borrowing` FOREIGN KEY (`library_id`) REFERENCES `libraries` (`library_id`),
-    CONSTRAINT `fk_user_borrowing` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+    CONSTRAINT `fk_member_borrowing` FOREIGN KEY (`member_id`) REFERENCES `members` (`members_id`),
     CONSTRAINT `fk_book_borrowing` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`)
 ) ENGINE = InnoDB COMMENT = 'A table to record borrowing history';
 
--- Fines
 CREATE TABLE IF NOT EXISTS `fines` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `amount` DECIMAL,
     `paid` BOOLEAN,
-    -- Added the missing library_id field
     `library_id` INT,
-    -- Added the missing borrowing_history_id field
     `borrowing_history_id` INT,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_library_fines` FOREIGN KEY (`library_id`) REFERENCES `libraries` (`library_id`),
