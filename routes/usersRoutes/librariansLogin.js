@@ -11,8 +11,8 @@ router.post('/', async (req, res) => {
         const { username, password } = req.body;
 
         // Fetch librarian details from the database
-        const librarian = await UsersModel.getUserByUsername(username);
-
+        const librarian = await UsersModel.getLibrarianByUsername(username);
+        console.log(`from login route ${librarian}`)
         if (!librarian) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
