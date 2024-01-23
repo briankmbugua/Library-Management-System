@@ -16,7 +16,7 @@ class UsersModel {
                 const hashedPassword = await hashPassword(password);
                 console.log(`the params:${hashedPassword}`)
                 role = "librarian"
-                const query = 'INSERT INTO users (username, password, email, role, library_id) VALUES (?, ?, ?, ?, ?)';
+                const query = 'INSERT INTO librarians (username, password, email, role, library_id) VALUES (?, ?, ?, ?, ?)';
                 const params = [username, hashedPassword, email, role, library_id];
                 console.log(`the params:${params}`)
                 const result = await db.query(query, params);
@@ -31,9 +31,47 @@ class UsersModel {
             throw error;
         }
     }
-    static async getUserById(userId, libraryId) {
+
+    static async getLibrarianByUsername(username) {
         try {
-            const query = 'SELECT * FROM users WHERE id = ? AND library_id = ?';
+            const query = 'SELECT * FROM librarians WHERE username = ?';
+            const params = [username];
+            const results = await db.query(query, params);
+    
+            if (results.length > 0) {
+                return results[0];
+            } else {
+                return null; 
+            }
+        } catch (error) {
+            console.error('Error in getLibrarianByUsernameAndLibrary:', error.message);
+            return null; 
+        }
+    }
+
+    static async registerLibraryMember(username, email, library_id) {
+        try {
+            const query = 'INSERT INTO members(username, email,  library_id) VALUES (?, ?, ?)';
+            const params = [username,  email, library_id];
+            const result = await db.query(query, params);
+            if (result) {
+                return {userId: result.insertId, username, email};
+            } else {
+                return null;
+            }
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+    
+
+
+
+
+    static async getMemberByMemberIdAndLibraryId(userId, libraryId) {
+        try {
+            const query = 'SELECT * FROM members WHERE id = ? AND library_id = ?';
             const params = [userId, libraryId];
             const results = await db.query(query, params);
             return results.length > 0 ? results[0] : null;
@@ -43,36 +81,36 @@ class UsersModel {
     }
     
 
-    static async getUserByUsernameAndLibrary(username, library_id) {
+    static async getMemberByUsernameAndLibraryId(username, library_id) {
         try {
-            const query = 'SELECT * FROM users WHERE username = ? AND library_id = ?';
+            const query = 'SELECT * FROM members WHERE username = ? AND library_id = ?';
             const params = [username, library_id];
             const results = await db.query(query, params);
     
             if (results.length > 0) {
                 return results[0];
             } else {
-                return null; // No user found with the given username and library_id
+                return null; 
             }
         } catch (error) {
-            console.error('Error in getUserByUsernameAndLibrary:', error.message);
-            return null; // Handle the error gracefully, return null or an appropriate value
+            console.error('Error in getMemberByUsernameAndLibrary:', error.message);
+            return null; 
         }
     }
-    static async getUserByUsername(username) {
+    static async getMemberByUsernameOrEmail(username, email) {
         try {
-            const query = 'SELECT * FROM users WHERE username = ?';
-            const params = [username];
+            const query = 'SELECT * FROM members WHERE username = ? OR email = ?';
+            const params = [username, email];
             const results = await db.query(query, params);
     
             if (results.length > 0) {
                 return results[0];
             } else {
-                return null; // No user found with the given username and library_id
+                return null;
             }
         } catch (error) {
-            console.error('Error in getUserByUsername:', error.message);
-            return null; // Handle the error gracefully, return null or an appropriate value
+            console.error('Error in getMemeberByUsernameOrEmail:', error.message);
+            return null;
         }
     }
     
@@ -97,18 +135,38 @@ class UsersModel {
             throw error;
         }
     }
+
+    static async updateMemberDetails(memberID, libraryId, updateDetails) {
+        try {
+            const { username,  name, email } = updateDetails;
+    
+            const query = 'UPDATE members SET username = ?, name = ?, email = ? WHERE id = ? AND library_id = ?';
+            const params = [username, name, email, memberID, libraryId];
+    
+            const result = await db.query(query, params);
+    
+            // Check if the update was successful
+            if (result.affectedRows > 0) {
+                return { success: true, message: 'Member details updated successfully' };
+            } else {
+                return { success: false, message: 'Memeber not found in the specified library or no changes applied' };
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
     
 
-    static async deleteUser(userId, libraryId) {
+    static async deleteMember(memberID, libraryId) {
         try {
-            const query = 'DELETE FROM users WHERE id = ? AND library_id = ?';
-            const params = [userId, libraryId];
+            const query = 'DELETE FROM members WHERE id = ? AND library_id = ?';
+            const params = [memberID, libraryId];
     
             const result = await db.query(query, params);
             if (result.affectedRows > 0) {
-                return { success: true, message: 'User deleted successfully' };
+                return { success: true, message: 'Member deleted successfully' };
             } else {
-                return { success: false, message: 'User not found in the specified library or deletion unsuccessful' };
+                return { success: false, message: 'Member not found in the specified library or deletion unsuccessful' };
             }
         } catch (error) {
             throw error;
