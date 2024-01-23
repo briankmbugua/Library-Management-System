@@ -14,6 +14,9 @@ let deleteLibrary = require('./routes/libraryRoutes/deleteLibrary');
 let addBook = require('./routes/booksRoutes/addBook');
 let loggedInLibrarianBooks = require('./routes/booksRoutes/loggedInLibrarianBooks');
 let updateBook = require('./routes/booksRoutes/updateBook');
+let deleteBook = require('./routes/booksRoutes/deleteBook');
+//members
+let registerLibraryMember = require('./routes/usersRoutes/librarianRegisterUsers');
 let app = express();
 
 // view engine setup
@@ -36,7 +39,9 @@ app.use('/deleteLibrary', deleteLibrary);
 app.use('/addBook', addBook);
 app.use('/loggedInLibrarianBooks', loggedInLibrarianBooks);
 app.use('/updateBook', updateBook);
-
+app.use('/deleteBook', deleteBook);
+//members
+app.use('/registerLibraryMember', registerLibraryMember);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
