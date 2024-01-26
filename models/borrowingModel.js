@@ -1,10 +1,10 @@
 const db = require('../services/db');
 
 class BorrowingModel {
-    static async issueBook(userId, bookId, libraryId) {
-        try {
-            const query = 'INSERT INTO borrowing_history (user_id, book_id, library_id, borrowed_date) VALUES (?, ?, ?, CURRENT_TIMESTAMP)';
-            const params = [userId, bookId, libraryId];
+    static async issueBook(book_id, member_id,  libraryId) {
+        try {-id
+            const query = 'INSERT INTO borrowing_history (book_id, member_id, library_id, borrowed_date) VALUES (?, ?, ?, CURRENT_TIMESTAMP)';
+            const params = [book_id, member_id, libraryId];
             const result = await db.query(query, params);
 
             return result.affectedRows > 0;
