@@ -15,8 +15,11 @@ let addBook = require('./routes/booksRoutes/addBook');
 let loggedInLibrarianBooks = require('./routes/booksRoutes/loggedInLibrarianBooks');
 let updateBook = require('./routes/booksRoutes/updateBook');
 let deleteBook = require('./routes/booksRoutes/deleteBook');
+//issueBooks
+let issueBook = require('./routes/borrowingRoutes/issueBook');
 //members
-let registerLibraryMember = require('./routes/usersRoutes/librarianRegisterUsers');
+let registerLibraryMember = require('./routes/usersRoutes/librarianRegisterLibraryMember');
+let loggedInLibrianMembers = require('./routes/usersRoutes/libraryMembers');
 let app = express();
 
 // view engine setup
@@ -28,7 +31,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+//library
 app.use('/', indexRouter);
 app.use('/registerlibrarianAndLibrary', registerlibrarianAndLibrary);
 app.use('/librarianLogin', librarianLogin);
@@ -40,8 +43,17 @@ app.use('/addBook', addBook);
 app.use('/loggedInLibrarianBooks', loggedInLibrarianBooks);
 app.use('/updateBook', updateBook);
 app.use('/deleteBook', deleteBook);
+//issueBooks
+app.use('/issueBook', issueBook);
+
 //members
 app.use('/registerLibraryMember', registerLibraryMember);
+app.use('/loggedInLibrarianMembers', loggedInLibrianMembers);
+
+
+
+
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
