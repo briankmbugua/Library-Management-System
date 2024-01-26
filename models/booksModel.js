@@ -37,7 +37,7 @@ class BooksModel {
 
     static async getAllBooksForLoggedInLibrarian(user) {
         try {
-            const libraryId = user.library.id; // Assuming the library id is available in req.user.library.id
+            const libraryId = user.library.id;
             const query = 'SELECT * FROM books WHERE library_id = ?';
             const params = [libraryId];
             const results = await db.query(query, params);
@@ -130,6 +130,25 @@ class BooksModel {
             throw error;
         }
     }
+
+    static async checkBookAvailability(bookId) {
+        try {
+            const query = 'SELECT available FROM books WHERE id = ?';
+            const params = [bookId];
+            const result = await db.query(query, params);
+    
+            if (result.length > 0) {
+                const isAvailable = result[0].available;
+                return { available: isAvailable };
+            } else {
+                return { error: 'Book not found' };
+            }
+        } catch (error) {
+            console.error('Error in checkBookAvailability:', error.message);
+            return { error: 'Internal Server Error' };
+        }
+    }
+    
 }
 
 module.exports = BooksModel;
