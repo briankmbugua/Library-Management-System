@@ -64,8 +64,19 @@ class UsersModel {
             throw error;
         }
     }
-    
 
+
+    static async getAllMembersForLoggedInLibrarian(user) {
+        try {
+            let libraryId = user.library.id;
+            const query = 'SELECT * FROM members WHERE library_id = ?';
+            const params = [libraryId];
+            const results = await db.query(query, params);
+            return results.length > 0 ? results[0] : null;
+        } catch (error) {
+            throw error;
+        }
+    }
 
 
 
