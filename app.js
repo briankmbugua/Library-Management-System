@@ -18,7 +18,7 @@ let deleteBook = require('./routes/booksRoutes/deleteBook');
 //issueBooks
 let issueBook = require('./routes/borrowingRoutes/issueBook');
 //members
-let registerLibraryMember = require('./routes/usersRoutes/librarianRegisterLibraryMember');
+let librarianRegisterLibraryMember = require('./routes/usersRoutes/librarianRegisterLibraryMember');
 let loggedInLibrianMembers = require('./routes/usersRoutes/libraryMembers');
 let app = express();
 
@@ -47,7 +47,7 @@ app.use('/deleteBook', deleteBook);
 app.use('/issueBook', issueBook);
 
 //members
-app.use('/registerLibraryMember', registerLibraryMember);
+app.use('/librarianRegisterLibraryMember', librarianRegisterLibraryMember);
 app.use('/loggedInLibrarianMembers', loggedInLibrianMembers);
 
 
