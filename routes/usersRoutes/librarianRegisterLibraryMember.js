@@ -17,9 +17,10 @@ router.post('/', authmiddleware, async (req, res) => {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
-        const existingUser = await UsersModel.getMemberByUsernameOrEmail(username, email);
+        console.log(`from librarianRegisterMember route library_id ${req.user.library.id}`)
+        const existingUser = await UsersModel.getMemberByUsernameAndEmailAndLibraryId(req.user.library.id,username, email);
         if (existingUser) {
-            return res.status(409).json({ error: 'Username or email already exists' });
+            return res.status(409).json({ error: 'User already exists' });
         }
         console.log(`username in librarianRegisterUsers ${username}`);
         console.log(`email in librarianRegisterUsers ${email}`);
