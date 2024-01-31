@@ -7,8 +7,9 @@ let authmiddleware = require('../../middlewares/authmiddleware');
 
 router.get('/', authmiddleware,async (req, res) => {
     try {
-        let libraryMembers = await usersModel.getAllMembersForLoggedInLibrarian(req.user);
+        let libraryMembers = await usersModel.getAllMembersForLoggedInLibrarian(req.user.library.id);
             res.status(200).json({libraryMembers});
+        console.log(`in the libraryMembers route ${libraryMembers.libraryMembers}`);
         
     
     } catch (error) {
