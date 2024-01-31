@@ -49,6 +49,9 @@ class UsersModel {
         }
     }
 
+
+    //Members
+    //Registration
     static async registerLibraryMember(username, email, library_id) {
         try {
             const query = 'INSERT INTO members(username, email,  library_id) VALUES (?, ?, ?)';
@@ -65,14 +68,14 @@ class UsersModel {
         }
     }
 
-
-    static async getAllMembersForLoggedInLibrarian(user) {
+    //get
+    static async getAllMembersForLoggedInLibrarian(library_id) {
         try {
-            let libraryId = user.library.id;
+            console.log(`fromAllMembersFprLoggedInLibrarian the library_id from user ${library_id}`);
             const query = 'SELECT * FROM members WHERE library_id = ?';
-            const params = [libraryId];
+            const params = [library_id];
             const results = await db.query(query, params);
-            return results.length > 0 ? results[0] : null;
+            return results.length > 0 ? results : null;
         } catch (error) {
             throw error;
         }
@@ -92,10 +95,10 @@ class UsersModel {
     }
     
 
-    static async getMemberByUsernameAndLibraryId(username, library_id) {
+    static async getMemberByUsernameAndEmailAndLibraryId(library_id, username, email) {
         try {
-            const query = 'SELECT * FROM members WHERE username = ? AND library_id = ?';
-            const params = [username, library_id];
+            const query = 'SELECT * FROM members WHERE library_id = ? AND username = ? AND email = ?';
+            const params = [library_id, username, email];
             const results = await db.query(query, params);
     
             if (results.length > 0) {
@@ -104,26 +107,26 @@ class UsersModel {
                 return null; 
             }
         } catch (error) {
-            console.error('Error in getMemberByUsernameAndLibrary:', error.message);
+            console.error('Error in getMemberByUsernameAndEmailAndLibraryId:', error.message);
             return null; 
         }
     }
-    static async getMemberByUsernameOrEmail(username, email) {
-        try {
-            const query = 'SELECT * FROM members WHERE username = ? OR email = ?';
-            const params = [username, email];
-            const results = await db.query(query, params);
+    // static async getMemberByUsernameOrEmail(username, email) {
+    //     try {
+    //         const query = 'SELECT * FROM members WHERE username = ? OR email = ?';
+    //         const params = [username, email];
+    //         const results = await db.query(query, params);
     
-            if (results.length > 0) {
-                return results[0];
-            } else {
-                return null;
-            }
-        } catch (error) {
-            console.error('Error in getMemeberByUsernameOrEmail:', error.message);
-            return null;
-        }
-    }
+    //         if (results.length > 0) {
+    //             return results[0];
+    //         } else {
+    //             return null;
+    //         }
+    //     } catch (error) {
+    //         console.error('Error in getMemeberByUsernameOrEmail:', error.message);
+    //         return null;
+    //     }
+    // }
     
 
 
