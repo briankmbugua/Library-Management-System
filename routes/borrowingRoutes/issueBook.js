@@ -12,15 +12,15 @@ router.post('/:id/:member_id', authmiddleware, async (req, res) => {
         console.log(`the id of the book being issued ${book_id}`);
         console.log(`the id of the member being issued the book ${book_id}`);
         // Update book availability
-        const isBookAvailable = await booksModel.checkBookAvailability(book_id);
-        console.log(`book availability ${isBookAvailable}`);
-        if (!isBookAvailable) {
+        const isBookAvailable = await booksModel.checkBookAvailability(book_id, library_id);
+        console.log(`book availability ${JSON.stringify(isBookAvailable.available)}`);
+        if (!isBookAvailable.available) {
             return res.status(400).json({ message: 'Book is not available for borrowing.' });
         }
 
         // Issue the book
         const issueResult = await borrowingModel.issueBook(member_id, library_id, book_id);
-
+        console.log(`issueresults ${JSON.stringify(issueResult)}`)
         if (issueResult) {
             res.status(200).json({ message: 'Book issued successfully.' });
         } else {
