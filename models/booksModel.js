@@ -48,97 +48,14 @@ class BooksModel {
         }
     }
 
-    // static async updateBookDetails(bookId, library_id, updatedDetails) {
-    //     try {
-    //         const { title, author, isbn, publicationDate, genre } = updatedDetails;
-    //         const query = 'UPDATE books SET title = ?, author = ?, genre = ? publicationDate = ? WHERE id = ?  AND library_id = ?';
-    //         //UPDATE books SET title = "bri" ,genre = "comedy" WHERE id = 1 AND library_id = 2;
-    //         const params = [title, author, isbn, publicationDate, genre, bookId, library_id];
-    //         const result = await db.query(query, params);
-
-    //         return result.affectedRows > 0;
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
-    static async updateBookDetails(bookId, library_id, updatedDetails) {
+    static async checkBookAvailability(bookId, library_id) {
         try {
-            const { title, author, isbn, publicationDate, genre } = updatedDetails;
-            const queryParams = [];
-            const updateFields = [];
-    
-            if (title) {
-                updateFields.push('title = ?');
-                queryParams.push(title);
-            }
-    
-            if (author) {
-                updateFields.push('author = ?');
-                queryParams.push(author);
-            }
-    
-            if (isbn) {
-                updateFields.push('isbn = ?');
-                queryParams.push(isbn);
-            }
-    
-            if (publicationDate) {
-                updateFields.push('publicationDate = ?');
-                queryParams.push(publicationDate);
-            }
-    
-            if (genre) {
-                updateFields.push('genre = ?');
-                queryParams.push(genre);
-            }
-    
-            // Ensure that there's at least one field to update
-            if (updateFields.length === 0) {
-                return false; // No fields to update
-            }
-    
-            const query = `UPDATE books SET ${updateFields.join(', ')} WHERE id = ? AND library_id = ?`;
-            console.log(`from updatebook ${query}`);
-            queryParams.push(bookId, library_id);
-    
-            const result = await db.query(query, queryParams);
-            return result.affectedRows > 0;
-        } catch (error) {
-            throw error;
-        }
-    }
-    
+            const query = 'SELECT available FROM books WHERE id = ? AND library_id = ?';
+            const params = [bookId, library_id];
+            const [result] = await db.query(query, params);
 
-    static async deleteBook(bookId, library_id) {
-        try {
-            const query = 'DELETE FROM books WHERE id = ? AND library_id = ?;';
-            const result = await db.query(query, [bookId, library_id]);
-
-            return result.affectedRows > 0;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    static async getAllBooks(libraryId) {
-        try {
-            const query = 'SELECT * FROM books WHERE library_id = ?';
-            const results = await db.query(query, [libraryId]);
-
-            return results || [];
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    static async checkBookAvailability(bookId) {
-        try {
-            const query = 'SELECT available FROM books WHERE id = ?';
-            const params = [bookId];
-            const result = await db.query(query, params);
-    
-            if (result.length > 0) {
-                const isAvailable = result[0].available;
+            if (result) {
+                const isAvailable = result.available;
                 return { available: isAvailable };
             } else {
                 return { error: 'Book not found' };
@@ -148,7 +65,26 @@ class BooksModel {
             return { error: 'Internal Server Error' };
         }
     }
-    
+
+    static async changeBookAvailability(bookId, library_id, newAvailability) {
+        try {
+            const query = 'UPDATE books SET available = ? WHERE id = ? AND library_id = ?';
+            const params = [newAvailability, bookId, library_id];
+            const result = await db.query(query, params);
+
+            if (result.affectedRows > 0) {
+                return { success: true };
+            } else {
+                return { error: 'Book not found or already has the specified availability' };
+            }
+        } catch (error) {
+            console.error('Error in changeBookAvailability:', error.message);
+            return { error: 'Internal Server Error' };
+        }
+    }
+
+
+
 }
 
 module.exports = BooksModel;
