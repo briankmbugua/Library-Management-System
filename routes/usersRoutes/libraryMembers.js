@@ -5,16 +5,13 @@ let authmiddleware = require('../../middlewares/authmiddleware');
 
 
 
-router.get('/', authmiddleware,async (req, res) => {
+router.get('/', authmiddleware, async (req, res) => {
     try {
         let libraryMembers = await usersModel.getAllMembersForLoggedInLibrarian(req.user.library.id);
-            res.status(200).json({libraryMembers});
-        console.log(`in the libraryMembers route ${libraryMembers.libraryMembers}`);
-        
-    
+        res.status(200).json({ libraryMembers });
     } catch (error) {
         console.error(error);
-        res.status(500).json({error: 'Internal Server Error'});
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
