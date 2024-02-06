@@ -7,14 +7,16 @@ const authmiddleware = require('../../middlewares/authmiddleware');
 router.delete('/:id', authmiddleware, async (req, res) => {
     try {
         const library_id = req.user.library.id;
-        console.log(`in the deleteBook router:library_id ${library_id}`);
-        const bookId = req.params.id;
-        console.log(`in the deleteBook router:bookid ${bookId}`);
-        const result = await booksModel.deleteBook(bookId, library_id);
-        if(result) {
-            res.status(200).json({message: "Book deleted succesfully"});
+        const bookId = req.params.id;        
+        const bookAvailability = await booksModel.checkBookAvailability(bookId, library_id);
+        if (!bookAvailability.available) {
+            return res.status(400).json({ message: "Book has already been issued." });
+        }
+        const deletionResult = await booksModel.deleteBook(req.user, bookId);
+        if (deletionResult) {
+            return res.status(200).json({ message: "Book deleted successfully." });
         } else {
-            res.status(500).json({error: "could not delete book"});
+            return res.status(500).json({ error: "Could not delete book." });
         }
     } catch (error) {
         console.error(error);
