@@ -34,6 +34,45 @@ class BooksModel {
         }
     }
 
+    static async updateBookDetails(bookId, libraryId, updatedDetails) {
+        try {
+            const queryParts = [];
+            const params = [];
+            for (const key in updatedDetails) {
+                if (updatedDetails.hasOwnProperty(key)) {
+                    queryParts.push(`${key} = ?`);
+                    params.push(updatedDetails[key]);
+                }
+            }
+
+            const query = `UPDATE books SET ${queryParts.join(',')} WHERE id = ? AND library_id = ?`;
+            console.log(`from updateBookDetails the ${query}`);
+            params.push(bookId, libraryId);
+
+            const result = await db.query(query, params);
+
+            return result.affectedRows > 0;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async deleteBook(user, bookId) {
+        try {
+            const libraryId = user.library.id;
+            const query = 'DELETE FROM books WHERE id = ? AND library_id = ?';
+            const params = [bookId, libraryId];
+            const results = await db.query(query, params);
+            if (results) {
+                return {"succes":"Book deleted succesfuly"}
+            } else {
+               return {"message":"Book not found"} 
+            }
+        } catch (error) {
+            console.error("error", error);
+        }
+    }
+
 
     static async getAllBooksForLoggedInLibrarian(user) {
         try {
@@ -50,10 +89,12 @@ class BooksModel {
 
     static async checkBookAvailability(bookId, library_id) {
         try {
+            console.log(`from checkBookAvailability:bookId ${bookId}`);
+            console.log(`from checkBookAvailability:bookId ${library_id}`);
             const query = 'SELECT available FROM books WHERE id = ? AND library_id = ?';
             const params = [bookId, library_id];
             const [result] = await db.query(query, params);
-
+            console.log(`from checkBookAvailability:queryResults ${result}`);
             if (result) {
                 const isAvailable = result.available;
                 return { available: isAvailable };
