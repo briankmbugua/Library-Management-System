@@ -1,6 +1,0 @@
-USE library_db;
-SHOW TABLES;
-DESCRIBE libraries;
-DESCRIBE users;
-DESCRIBE borrowing_history;
-DESCRIBE fines;

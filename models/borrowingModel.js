@@ -4,7 +4,9 @@ const BookModel = require('./booksModel');
 class BorrowingModel {
     static async issueBook(book_id, member_id, libraryId) {
         try {
-            
+            console.log(`the id of the book being issued ${book_id}`);
+            console.log(`the id of the member being issued the book ${member_id}`);
+            console.log(`the library_id ${libraryId}`);
             const bookAvailability = await BookModel.checkBookAvailability(book_id, libraryId);
             console.log(`from borrowing Model ${JSON.stringify(bookAvailability)}`);
             if (!bookAvailability.error && bookAvailability.available) {

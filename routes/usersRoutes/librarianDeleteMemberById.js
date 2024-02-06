@@ -4,7 +4,7 @@ const UsersModel = require('../../models/usersModel');
 const authmiddleware = require('../../middlewares/authmiddleware');
 
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authmiddleware, async (req, res) => {
     try {
         let deletedMember = await UsersModel.deleteMember(req.params.id);
         if (deletedMember){

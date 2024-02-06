@@ -18,7 +18,7 @@ function authenticateMiddleware(req, res, next) {
         if (err) {
             return res.status(403).json({ message: 'Forbidden' });
         }
-
+        console.log('Decoded user from token:', user);
         // Set the authenticated user information to req.user
         req.user = user;
         next();
