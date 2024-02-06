@@ -80,76 +80,23 @@ class UsersModel {
             throw error;
         }
     }
-
-
-
-    static async getMemberByMemberIdAndLibraryId(userId, libraryId) {
+    //delete a libraryMember
+    static async deleteMember(memberID, libraryId) {
         try {
-            const query = 'SELECT * FROM members WHERE id = ? AND library_id = ?';
-            const params = [userId, libraryId];
-            const results = await db.query(query, params);
-            return results.length > 0 ? results[0] : null;
-        } catch (error) {
-            throw error;
-        }
-    }
-    
-
-    static async getMemberByUsernameAndEmailAndLibraryId(library_id, username, email) {
-        try {
-            const query = 'SELECT * FROM members WHERE library_id = ? AND username = ? AND email = ?';
-            const params = [library_id, username, email];
-            const results = await db.query(query, params);
-    
-            if (results.length > 0) {
-                return results[0];
-            } else {
-                return null; 
-            }
-        } catch (error) {
-            console.error('Error in getMemberByUsernameAndEmailAndLibraryId:', error.message);
-            return null; 
-        }
-    }
-    // static async getMemberByUsernameOrEmail(username, email) {
-    //     try {
-    //         const query = 'SELECT * FROM members WHERE username = ? OR email = ?';
-    //         const params = [username, email];
-    //         const results = await db.query(query, params);
-    
-    //         if (results.length > 0) {
-    //             return results[0];
-    //         } else {
-    //             return null;
-    //         }
-    //     } catch (error) {
-    //         console.error('Error in getMemeberByUsernameOrEmail:', error.message);
-    //         return null;
-    //     }
-    // }
-    
-
-
-    static async updateUserDetails(userId, libraryId, updateDetails) {
-        try {
-            const { username, password, name, email } = updateDetails;
-    
-            const query = 'UPDATE users SET username = ?, password = ?, name = ?, email = ? WHERE id = ? AND library_id = ?';
-            const params = [username, password, name, email, userId, libraryId];
+            const query = 'DELETE FROM members WHERE id = ? AND library_id = ?';
+            const params = [memberID, libraryId];
     
             const result = await db.query(query, params);
-    
-            // Check if the update was successful
             if (result.affectedRows > 0) {
-                return { success: true, message: 'User details updated successfully' };
+                return { success: true, message: 'Member deleted successfully' };
             } else {
-                return { success: false, message: 'User not found in the specified library or no changes applied' };
+                return { success: false, message: 'Member not found in the specified library or deletion unsuccessful' };
             }
         } catch (error) {
             throw error;
         }
     }
-
+    //update a libraryMember
     static async updateMemberDetails(memberID, libraryId, updateDetails) {
         try {
             const { username,  name, email } = updateDetails;
@@ -169,24 +116,20 @@ class UsersModel {
             throw error;
         }
     }
-    
+    //check whether a member has a currently issued book.
 
-    static async deleteMember(memberID, libraryId) {
+
+
+    static async getMemberByMemberIdAndLibraryId(userId, libraryId) {
         try {
-            const query = 'DELETE FROM members WHERE id = ? AND library_id = ?';
-            const params = [memberID, libraryId];
-    
-            const result = await db.query(query, params);
-            if (result.affectedRows > 0) {
-                return { success: true, message: 'Member deleted successfully' };
-            } else {
-                return { success: false, message: 'Member not found in the specified library or deletion unsuccessful' };
-            }
+            const query = 'SELECT * FROM members WHERE id = ? AND library_id = ?';
+            const params = [userId, libraryId];
+            const results = await db.query(query, params);
+            return results.length > 0 ? results[0] : null;
         } catch (error) {
             throw error;
         }
     }
-    
 }
 
 async function hashPassword(password) {
