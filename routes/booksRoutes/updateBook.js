@@ -2,26 +2,30 @@ let express = require('express');
 let router = express.Router();
 let booksModel = require('../../models/booksModel');
 const authmiddleware = require('../../middlewares/authmiddleware');
-const bookParamMiddleware = require('../../middlewares/bookParamMiddleware');
 
 
-router.post('/:id', authmiddleware, async(req, res) => {
+router.post('/:id', authmiddleware, async (req, res) => {
     try {
         const library_id = req.user.library.id;
-        console.log(`in the updateBook router:library_id ${library_id}`);
         const bookId = req.params.id;
-        console.log(`in the updateBook router:library_id ${bookId}`);
         const updatedDetails = req.body;
-        console.log(`in the updateBook router:library_id ${updatedDetails}`);
+
+        // Check book availability
+        const bookAvailability = await booksModel.checkBookAvailability(bookId, library_id);
+        if (!bookAvailability.available) {
+            return res.status(400).json({ message: "Book is not available for updating." });
+        }
+
+        // Update book details
         const result = await booksModel.updateBookDetails(bookId, library_id, updatedDetails);
-        if(result) {
-            res.status(200).json({message:"Book details updated succesfully"});
+        if (result) {
+            return res.status(200).json({ message: "Book details updated successfully." });
         } else {
-            res.status(500).json({error:"could not update book"});
+            return res.status(500).json({ error: "Could not update book details." });
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({error: "Internal server errror"});
+        return res.status(500).json({ error: "Internal server error." });
     }
 });
 
